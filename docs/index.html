@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nebenkostenrechner – kostenlose Nebenkostenabrechnung für Vermieter (Windows und Mac)</title>
+<meta name="description" content="Ein kostenloses Programm für Vermieter, die ihre Nebenkostenabrechnung selbst machen: Verbrauch und Kosten tagesgenau auf die Mieter verteilt, jeder Rechenschritt sichtbar, alles ein zweites Mal unabhängig nachgerechnet. Für Windows und Mac, die Daten bleiben auf dem eigenen Rechner.">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/png" href="bilder/symbol.png">
+<link rel="canonical" href="https://marvion123.github.io/Nebenkostenrechner-Releases/">
+<meta property="og:title" content="Nebenkostenrechner">
+<meta property="og:description" content="Nebenkostenabrechnungen, die jeder nachrechnen kann. Kostenlos für Windows und Mac.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="de_DE">
+<style>
+  /* Schrift: Bitter (SIL Open Font License, siehe schrift/OFL-Bitter.txt), liegt hier selbst.
+     Die Seite lädt nichts von fremden Servern. */
+  @font-face {
+    font-family: "Bitter";
+    src: url("schrift/bitter.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Farben aus dem Programm: Blau der Oberfläche und des Dachs im Gebäudebild, Grün der Nachrechnung.
+     Schwarz und Rot nur im Zählwerk, so wie auf einem echten Wasserzähler. */
+  :root {
+    --grund: #eaf0f5;
+    --bogen: #ffffff;
+    --tinte: #1b2b3d;
+    --leise: #4f6072;
+    --linie: #c9d6e2;
+    --blau: #2c6ca8;
+    --blau-tief: #1f5287;
+    --dach: #345e9c;
+    --werk: #1d2633;
+    --ziffer: #f2f5f8;
+    --rot: #b42a22;
+    --gruen: #1a7f37;
+    --gruen-hell: #e6f4ea;
+
+    --serif: "Bitter", "Rockwell", "Roboto Slab", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    --spalte: 68rem;
+    --mass: 40rem;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 5rem; }
+  body {
+    margin: 0;
+    background: var(--grund);
+    color: var(--tinte);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--blau-tief); text-underline-offset: 0.18em; }
+  a:hover { color: var(--blau); }
+  :focus-visible { outline: 3px solid var(--blau); outline-offset: 3px; border-radius: 3px; }
+
+  h1, h2, h3 { font-family: var(--serif); color: var(--tinte); line-height: 1.2; margin: 0; }
+  h1 { font-size: clamp(2rem, 1.3rem + 2.9vw, 3.15rem); font-weight: 650; letter-spacing: -0.01em; hyphens: manual; overflow-wrap: break-word; }
+  h2 { font-size: clamp(1.55rem, 1.25rem + 1.1vw, 2rem); font-weight: 620; }
+  h3 { font-size: 1.15rem; font-weight: 620; }
+  p { margin: 0; }
+  p + p { margin-top: 0.9em; }
+
+  .wrap { max-width: var(--spalte); margin: 0 auto; padding: 0 1.5rem; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .skip { position: absolute; left: 1rem; top: -3rem; background: var(--bogen); padding: 0.5rem 0.8rem; z-index: 10; }
+  .skip:focus { top: 0.6rem; }
+
+  /* ------------------------------------------------------------ Kopf */
+  .kopf { background: var(--bogen); border-bottom: 1px solid var(--linie); }
+  .kopf .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4rem; }
+  .marke { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: var(--tinte); }
+  .marke img { width: 2.25rem; height: 2.25rem; }
+  .marke span { font-family: var(--serif); font-weight: 650; font-size: 1.15rem; }
+  .kopf nav { display: flex; align-items: center; gap: 1.25rem; font-size: 0.98rem; }
+  .kopf nav a { text-decoration: none; }
+  .kopf nav a:hover { text-decoration: underline; }
+
+  .knopf {
+    display: inline-block; text-decoration: none; font-weight: 600;
+    background: var(--blau); color: #fff; border: 1px solid var(--blau-tief);
+    padding: 0.62rem 1.15rem; border-radius: 6px; line-height: 1.2;
+  }
+  .knopf:hover { background: var(--blau-tief); color: #fff; }
+  .knopf.zweit { background: var(--bogen); color: var(--blau-tief); border-color: var(--linie); }
+  .knopf.zweit:hover { border-color: var(--blau); color: var(--blau); background: var(--bogen); }
+  .kopf .knopf { padding: 0.45rem 0.9rem; }
+
+  /* ------------------------------------------------------------ Einstieg mit Zählwerk */
+  .einstieg { padding: clamp(2.5rem, 6vw, 4.75rem) 0 clamp(2.75rem, 6vw, 4.5rem); }
+  .einstieg .wrap {
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(2rem, 5vw, 4.5rem); align-items: center;
+  }
+  .einstieg h1 { max-width: 16ch; text-wrap: balance; }
+  .vorspann { margin-top: 1.25rem; font-size: 1.15rem; color: var(--leise); max-width: 34rem; }
+  .vorspann strong { color: var(--tinte); font-weight: 600; }
+  .aktionen { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .klein { font-size: 0.92rem; color: var(--leise); margin-top: 1rem; }
+
+  .zaehler {
+    margin: 0; background: var(--bogen); border: 1px solid var(--linie); border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.25rem; box-shadow: 0 1px 0 var(--linie), 0 14px 32px -22px rgba(27, 43, 61, 0.45);
+  }
+  .schild {
+    background: linear-gradient(#f7f9fb, #e9eef3); border: 1px solid #c3cfda; border-radius: 10px;
+    padding: 0.9rem 1rem 1rem; text-align: center;
+  }
+  .zname { font-size: 0.9rem; color: var(--leise); }
+  .werkzeile { display: flex; justify-content: center; align-items: flex-end; gap: 0.6rem; margin-top: 0.55rem; }
+  .werk {
+    display: flex; gap: 3px; padding: 5px; background: #9aa8b6; border-radius: 6px;
+    font-family: var(--serif); font-weight: 700; font-size: clamp(1.9rem, 1.4rem + 2vw, 2.6rem);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .rad {
+    width: 0.86em; height: 1.32em; overflow: hidden; background: var(--werk); color: var(--ziffer);
+    border-radius: 3px; position: relative;
+    box-shadow: inset 0 0.28em 0.3em -0.2em rgba(0,0,0,0.7), inset 0 -0.28em 0.3em -0.2em rgba(0,0,0,0.7);
+  }
+  .rad.nach { background: var(--rot); }
+  .rad.komma { width: auto; background: transparent; box-shadow: none; color: var(--werk); padding: 0 1px; }
+  .rad .band { display: flex; flex-direction: column; line-height: 1.32em; text-align: center; }
+  .rad .band span { height: 1.32em; }
+  .einheit { font-family: var(--serif); font-weight: 600; font-size: 1.2rem; padding-bottom: 0.35rem; }
+
+  .verteilung { width: 100%; border-collapse: collapse; margin-top: 1.1rem; font-size: 0.98rem; }
+  .verteilung th, .verteilung td { padding: 0.5rem 0.25rem; text-align: left; vertical-align: baseline; }
+  .verteilung thead th { font-size: 0.85rem; font-weight: 600; color: var(--leise); border-bottom: 1px solid var(--linie); }
+  .verteilung tbody tr + tr td, .verteilung tbody tr + tr th { border-top: 1px solid #e3e9ef; }
+  .verteilung tbody th { font-weight: 600; }
+  .verteilung .z { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .verteilung tfoot td, .verteilung tfoot th { border-top: 2px solid var(--tinte); font-weight: 700; }
+  .anteil { display: block; font-size: 0.85rem; color: var(--leise); font-weight: 400; }
+  .pruefung {
+    display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; padding: 0.55rem 0.75rem;
+    background: var(--gruen-hell); color: #14532a; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+  }
+  .pruefung svg { flex: none; }
+  .zaehler figcaption { font-size: 0.85rem; color: var(--leise); margin-top: 0.85rem; }
+
+  /* Ein einziger Ablauf beim Laden: Das Zählwerk dreht hoch, danach erscheint die Verteilung. */
+  @media (prefers-reduced-motion: no-preference) {
+    .rad .band { animation: drehen 1.5s cubic-bezier(.2,.7,.2,1) both; }
+    .rad.d1 .band { animation-delay: 0.05s; }
+    .rad.d2 .band { animation-delay: 0.15s; animation-duration: 1.7s; }
+    .rad.d3 .band { animation-delay: 0.25s; animation-duration: 1.9s; }
+    .rad.d4 .band { animation-delay: 0.35s; animation-duration: 2.1s; }
+    .rad.d5 .band { animation-delay: 0.45s; animation-duration: 2.3s; }
+    .verteilung tbody tr, .verteilung tfoot tr, .pruefung { animation: zeigen 0.45s ease-out both; }
+    .verteilung tbody tr:nth-child(1) { animation-delay: 2.0s; }
+    .verteilung tbody tr:nth-child(2) { animation-delay: 2.25s; }
+    .verteilung tfoot tr { animation-delay: 2.5s; }
+    .pruefung { animation-delay: 2.8s; }
+  }
+  @keyframes drehen { from { transform: translateY(0); } }
+  @keyframes zeigen { from { opacity: 0; transform: translateY(4px); } }
+
+  /* ------------------------------------------------------------ Abschnitte */
+  .abschnitt { padding: clamp(2.75rem, 6vw, 4.25rem) 0; }
+  .abschnitt.hell { background: var(--bogen); border-top: 1px solid var(--linie); border-bottom: 1px solid var(--linie); }
+  .abschnitt h2 { max-width: 30ch; }
+  .einleitung { margin-top: 0.85rem; max-width: var(--mass); color: var(--leise); }
+
+  /* Was abgerechnet wird: als Bogen mit Positionen, wie in der Abrechnung selbst */
+  .positionen {
+    margin: 2rem 0 0; background: var(--bogen); border: 1px solid var(--linie); border-radius: 10px;
+    padding: 0.25rem 1.5rem;
+  }
+  .positionen div {
+    display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: 1.5rem; padding: 1.05rem 0;
+  }
+  .positionen div + div { border-top: 1px solid #e1e8ef; }
+  .positionen dt { font-family: var(--serif); font-weight: 620; font-size: 1.08rem; }
+  .positionen dd { margin: 0; max-width: 44rem; }
+
+  /* Bilder */
+  .bilder { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.75rem; margin-top: 2rem; }
+  .bilder figure { margin: 0; }
+  .gross { display: block; border-radius: 8px; }
+  .gross:hover img { border-color: var(--blau); }
+  .bilder img { width: 100%; border: 1px solid var(--linie); border-radius: 8px; box-shadow: 0 10px 24px -20px rgba(27,43,61,.5); background: var(--bogen); }
+  .bilder figcaption { margin-top: 0.7rem; font-size: 0.95rem; color: var(--leise); max-width: 34rem; }
+  .bilder figcaption strong { color: var(--tinte); }
+
+  /* Woran man sieht, dass es stimmt */
+  .belege { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 3rem; margin-top: 2rem; }
+  .belege p { margin-top: 0.5rem; max-width: 30rem; }
+  .belege h3 { padding-left: 0.85rem; border-left: 3px solid var(--blau); }
+
+  /* Daten */
+  .zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  ul.liste { margin: 1rem 0 0; padding-left: 1.2rem; }
+  ul.liste li + li { margin-top: 0.45rem; }
+
+  /* Herunterladen */
+  .tabelle { width: 100%; border-collapse: collapse; margin-top: 1.75rem; background: var(--bogen); border: 1px solid var(--linie); border-radius: 10px; overflow: hidden; }
+  .tabelle th, .tabelle td { padding: 0.8rem 1rem; text-align: left; vertical-align: top; }
+  .tabelle thead th { background: #f4f7fa; font-family: var(--serif); font-weight: 620; border-bottom: 1px solid var(--linie); }
+  .tabelle tbody tr + tr > * { border-top: 1px solid #e1e8ef; }
+  .tabelle tbody th { font-weight: 600; width: 34%; }
+  .tabelle code, .datei { font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; font-size: 0.88em; background: #eef2f6; padding: 0.08em 0.35em; border-radius: 4px; }
+  .tabelle code { white-space: nowrap; }
+  .tabelle code wbr { white-space: normal; }
+  .tabelle .anm { display: block; font-weight: 400; color: var(--leise); font-size: 0.92rem; margin-top: 0.2rem; }
+  .schritte { margin-top: 2.25rem; }
+  .schritte ol { margin: 0.75rem 0 0; padding-left: 1.35rem; }
+  .schritte li + li { margin-top: 0.5rem; }
+  .schritte li::marker { font-family: var(--serif); font-weight: 650; color: var(--blau-tief); }
+
+  /* Grenzen und Lizenz */
+  .grenzen ul { margin: 1rem 0 0; padding-left: 1.2rem; max-width: var(--mass); }
+  .grenzen li + li { margin-top: 0.5rem; }
+
+  /* Kaffee */
+  .kaffee .wrap { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.75rem; align-items: center; }
+  .kaffee img { width: 5.5rem; height: 5.5rem; }
+  .kaffee p { max-width: var(--mass); }
+  .kaffee .aktionen { margin-top: 1.25rem; }
+
+  /* Fuß */
+  .fuss { padding: 2rem 0 2.5rem; font-size: 0.92rem; color: var(--leise); }
+  .fuss p + p { margin-top: 0.4rem; }
+
+  /* ------------------------------------------------------------ schmal */
+  @media (max-width: 860px) {
+    .einstieg .wrap, .zwei { grid-template-columns: minmax(0, 1fr); }
+    .einstieg h1 { max-width: 18ch; }
+    .positionen div { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
+    .bilder, .belege { grid-template-columns: minmax(0, 1fr); }
+    .zwei { gap: 1.25rem; }
+    .grenzen .zwei { gap: 2.5rem; }
+    .tabelle code { white-space: normal; overflow-wrap: normal; word-break: keep-all; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 1.1rem; }
+    .kopf nav { display: none; }
+    .positionen { padding: 0.25rem 1rem; }
+    .zaehler { padding: 1rem 0.9rem 0.9rem; }
+    .verteilung { font-size: 0.92rem; }
+    .tabelle th, .tabelle td { padding: 0.65rem 0.7rem; }
+    .kaffee .wrap { grid-template-columns: minmax(0, 1fr); }
+    .kaffee img { width: 4rem; height: 4rem; }
+  }
+  @media (max-width: 360px) {
+    .tabelle th, .tabelle td { padding: 0.55rem 0.45rem; }
+    .tabelle code { font-size: 0.78em; }
+    .tabelle th, .tabelle td { padding: 0.5rem 0.35rem; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header class="kopf">
+  <div class="wrap">
+    <a class="marke" href="#">
+      <img src="bilder/symbol.png" width="36" height="36" alt="">
+      <span>Nebenkostenrechner</span>
+    </a>
+    <nav aria-label="Hauptnavigation">
+      <a class="text" href="#funktionen">Funktionen</a>
+      <a class="text" href="#kaffee">Kaffee ausgeben</a>
+      <a class="knopf" href="#herunterladen">Herunterladen</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inhalt">
+
+<section class="einstieg" aria-labelledby="titel">
+  <div class="wrap">
+    <div>
+      <h1 id="titel">Neben&shy;kosten&shy;abrechnungen, die jeder nachrechnen kann</h1>
+      <p class="vorspann">
+        Ein kostenloses Programm für Vermieter, die ihre Abrechnung selbst machen. Es verteilt Verbrauch und Kosten
+        tagesgenau auf die Mieter, zeigt jeden Rechenschritt und rechnet alles ein zweites Mal unabhängig nach.
+        <strong>Für Windows und Mac. Deine Daten bleiben auf deinem Rechner.</strong>
+      </p>
+      <div class="aktionen">
+        <a class="knopf" href="#herunterladen">Herunterladen</a>
+        <a class="knopf zweit" href="#funktionen">Was es abrechnet</a>
+      </div>
+      <p class="klein">Freeware, privat und gewerblich nutzbar. Keine Anmeldung, kein Abo. Zum Ausprobieren gibt es eine Demo mit erfundenen Gebäuden und Mietern.</p>
+    </div>
+
+    <figure class="zaehler" aria-labelledby="zaehler-titel">
+      <div class="schild">
+        <p class="zname" id="zaehler-titel">Strom der Wärmepumpe für die Heizung, ein Jahr</p>
+        <div class="werkzeile">
+          <div class="werk" aria-hidden="true">
+            <span class="rad"><span class="band"><span>0</span></span></span>
+            <span class="rad d1"><span class="band" style="transform: translateY(-5.28em)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></span></span>
+            <span class="rad d2"><span class="band" style="transform: translateY(-13.2em)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></span></span>
+            <span class="rad d3"><span class="band" style="transform: translateY(-13.2em)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></span></span>
+            <span class="rad d4"><span class="band" style="transform: translateY(-13.2em)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></span></span>
+            <span class="rad komma">,</span>
+            <span class="rad nach d5"><span class="band" style="transform: translateY(-13.2em)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></span></span>
+          </div>
+          <span class="einheit">kWh</span>
+        </div>
+        <p class="sr-only">Gesamtzähler: 4.000 kWh</p>
+      </div>
+
+      <table class="verteilung">
+        <caption class="sr-only">Verteilung der 4.000 kWh auf zwei Einheiten zu 0,30 € je kWh</caption>
+        <thead>
+          <tr><th scope="col">Einheit</th><th scope="col" class="z">Anteil</th><th scope="col" class="z">Kosten</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">EG links<span class="anteil">Wärmemenge 6.000 von 10.000</span></th>
+            <td class="z">2.400 kWh</td><td class="z">720,00 €</td>
+          </tr>
+          <tr>
+            <th scope="row">EG rechts<span class="anteil">Wärmemenge 4.000 von 10.000</span></th>
+            <td class="z">1.600 kWh</td><td class="z">480,00 €</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><th scope="row">Zusammen</th><td class="z">4.000 kWh</td><td class="z">1.200,00 €</td></tr>
+        </tfoot>
+      </table>
+      <p class="pruefung">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="#1a7f37"/><path d="M5.5 10.4l3 3 6-6.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Nachrechnung stimmt auf den Cent
+      </p>
+      <figcaption>Das Beispiel aus der Anleitung: Der Strom der Wärmepumpe wird nach den Wärmemengenzählern der beiden Einheiten verteilt, zu 0,30 € je kWh.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="abschnitt hell" id="funktionen" aria-labelledby="funktionen-titel">
+  <div class="wrap">
+    <h2 id="funktionen-titel">Was das Programm abrechnet</h2>
+    <p class="einleitung">
+      Von einer Wohnung bis zu mehreren Häusern auf mehreren Grundstücken. Am Ende steht für jeden Mieter eine
+      Abrechnung als PDF, in der jede Position mit ihrem Rechenweg steht.
+    </p>
+    <dl class="positionen">
+      <div>
+        <dt>Gebäude und Einheiten</dt>
+        <dd>Beliebig viele Gebäude mit benannten Stockwerken, Wohnungen und Nebenräumen wie Kellerabteil oder Speicher.
+          Das Programm zeichnet jedes Gebäude als Querschnitt; Einheiten und Stockwerke lassen sich darin verschieben.
+          Der Assistent „Geführt einrichten“ fragt ein Gebäude in acht Schritten ab.</dd>
+      </div>
+      <div>
+        <dt>Zähler und Zählerstände</dt>
+        <dd>Gesamtzähler und Zähler je Einheit, auch ein gemeinsamer Zähler zweier Einheiten. Zähler, die nur Anteile
+          bestimmen, etwa die Wärmemenge an einer Wärmepumpe, zählen ohne Maßeinheit. Für jeden Ablesetag zeigt das
+          Programm, welche Stände noch fehlen; ein getauschter Zähler wird mit Endstand und neuem Anfangsstand erfasst.</dd>
+      </div>
+      <div>
+        <dt>Mieterwechsel und Leerstand</dt>
+        <dd>Tagesgenau. Zieht jemand aus, teilen die Stände vom Auszugstag den Verbrauch; Tage ohne Mieter trägt der
+          Vermieter als eigene Zeile.</dd>
+      </div>
+      <div>
+        <dt>Kosten</dt>
+        <dd>Nach Verbrauch, nach Fläche, zu gleichen Teilen oder als Bruch wie 1/12. Eine Position kann nur ein Gebäude
+          betreffen, mehrere Gebäude oder nur einen Teil des Jahres. Preise gelten ab einem Datum; ändert sich ein
+          Preis im Jahr, wird tagesgenau geteilt.</dd>
+      </div>
+      <div>
+        <dt>Müll</dt>
+        <dd>Tonnen je Einheit mit Fraktion und Größe, dazu der Tarif der Gemeinde je Halbjahr. Wer unterjährig einzieht,
+          zahlt nur seine Tage.</dd>
+      </div>
+      <div>
+        <dt>Vorauszahlungen und Ergebnis</dt>
+        <dd>Monatliche Vorauszahlungen, auf die Mietzeit gerechnet, dagegen die Kosten: Nachzahlung oder Guthaben je Mieter.
+          Ein Dashboard zeigt, wohin das Geld geht, bis hinunter zu einem einzelnen Zähler.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="abschnitt" id="ansicht" aria-labelledby="ansicht-titel">
+  <div class="wrap">
+    <h2 id="ansicht-titel">So sieht es aus</h2>
+    <p class="einleitung">Alle Bilder stammen aus der Demo. Die Namen, Adressen und Zahlen darin sind erfunden. Ein Klick öffnet ein Bild in voller Größe.</p>
+    <div class="bilder">
+      <figure>
+        <a class="gross" href="bilder/gebaeude.webp">
+        <img src="bilder/gebaeude.webp" width="1200" height="727" loading="lazy"
+          alt="Bereich Gebäude: links das Vorderhaus als Querschnitt mit Stockwerken, Wohnungen, Kellerabteilen und Mülltonnen, in der Mitte der Baum, rechts die Daten des Gebäudes."></a>
+        <figcaption><strong>Gebäude.</strong> Links das Gebäude als Querschnitt, in der Mitte der Baum, rechts die Daten
+          dessen, was du anklickst. Unten rechnet das Dashboard in Kurzform nach jeder Eingabe neu.</figcaption>
+      </figure>
+      <figure>
+        <a class="gross" href="bilder/dashboard.webp">
+        <img src="bilder/dashboard.webp" width="1200" height="727" loading="lazy"
+          alt="Dashboard des Vorderhauses: grüne Prüfung, Kosten, Vorauszahlungen und Saldo je Stockwerk mit Tortendiagramm, darunter die Positionen mit ihrem Verteilschlüssel."></a>
+        <figcaption><strong>Dashboard.</strong> Ein Gebäude mit seiner Prüfung, den Kosten je Stockwerk und den Positionen.
+          Jede Zeile führt eine Ebene tiefer, bis zum Rechenweg eines Mieters.</figcaption>
+      </figure>
+      <figure>
+        <a class="gross" href="bilder/ergebnis.webp">
+        <img src="bilder/ergebnis.webp" width="1200" height="727" loading="lazy"
+          alt="Ergebnis einer laufenden Abrechnung: Liste „Was noch fehlt“ und darunter die Vorschau je Mieter mit rechenbaren Positionen und „fehlt noch“."></a>
+        <figcaption><strong>Was noch fehlt.</strong> Solange Angaben fehlen, steht hier, welche und wo. Die Vorschau
+          zeigt, was sich schon genau rechnen lässt.</figcaption>
+      </figure>
+      <figure>
+        <a class="gross" href="bilder/abrechnung.webp">
+        <img src="bilder/abrechnung.webp" width="1200" height="727" loading="lazy"
+          alt="Erste Seite der Abrechnung einer Mieterin als PDF: Zeitraum, Wohnung und je Position Kosten gesamt, Anteil und Betrag mit dem Rechenweg darunter."></a>
+        <figcaption><strong>Abrechnung.</strong> Je Mieter ein PDF mit allen Positionen, seinem Anteil und dem Rechenweg.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="abschnitt hell" id="nachrechnen" aria-labelledby="nachrechnen-titel">
+  <div class="wrap">
+    <h2 id="nachrechnen-titel">Woran du siehst, dass es stimmt</h2>
+    <p class="einleitung">
+      Eine Abrechnung muss für den Vermieter und für jeden Mieter nachvollziehbar sein. Darauf ist das Programm gebaut.
+    </p>
+    <div class="belege">
+      <div>
+        <h3>Jeder Rechenschritt steht da</h3>
+        <p>Ein Klick auf eine Position zeigt den Gesamtverbrauch, die Zähler der Einheiten, ihren Anteil und den Preis.
+          Im PDF steht unter jeder Position, wie der Betrag des Mieters zustande kommt.</p>
+      </div>
+      <div>
+        <h3>Ein zweiter, unabhängiger Rechenweg</h3>
+        <p>Jede Abrechnung wird ein zweites Mal auf anderem Weg gerechnet. Grün heißt: beide Wege kommen auf den Cent
+          zum selben Ergebnis. Rot zeigt eine Abweichung, bevor ein Mieter sie findet.</p>
+      </div>
+      <div>
+        <h3>Die Cent gehen auf</h3>
+        <p>Gerechnet wird mit dem genauen Verhältnis, nicht mit gerundeten Prozenten. Die Cent werden so verteilt, dass
+          alle Mieter zusammen genau die Kosten einer Position zahlen, nicht einen Cent mehr oder weniger.</p>
+      </div>
+      <div>
+        <h3>Nichts wird geschätzt</h3>
+        <p>Fehlt ein Zählerstand oder ein Betrag, sagt das Programm genau, welcher, und führt zur Stelle, an der er
+          fehlt. Bis dahin zeigt die Vorschau nur, was sich schon genau rechnen lässt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="abschnitt" id="daten" aria-labelledby="daten-titel">
+  <div class="wrap zwei">
+    <div>
+      <h2 id="daten-titel">Deine Daten bleiben bei dir</h2>
+      <p class="einleitung">
+        Das Programm läuft komplett auf deinem Rechner. Es gibt kein Konto und keinen Server, auf dem Namen,
+        Verbräuche oder Beträge deiner Mieter landen.
+      </p>
+    </div>
+    <ul class="liste">
+      <li>Alle Daten liegen in einer Datei im Ordner „Nebenkostenrechner“ in deinem Benutzerordner.</li>
+      <li>Ins Internet geht nur eine Frage: ob es eine neue Programmversion gibt.</li>
+      <li>Auf Wunsch sichert das Programm beim Start und beim Schließen an einen zweiten Ort, etwa eine externe
+        Festplatte; die letzten 30 Stände bleiben erhalten.</li>
+      <li>Eine tägliche Prüfung kann melden, wenn einer Abrechnung Zählerstände fehlen oder eine Frist näher rückt.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="abschnitt hell" id="herunterladen" aria-labelledby="herunterladen-titel">
+  <div class="wrap">
+    <h2 id="herunterladen-titel">Herunterladen und installieren</h2>
+    <p class="einleitung">
+      Auf der Release-Seite steht immer die neueste Version. Programm und Demo können nebeneinander installiert
+      sein; sie berühren sich nicht.
+    </p>
+    <table class="tabelle">
+      <thead>
+        <tr><th scope="col">Was du brauchst</th><th scope="col">Windows</th><th scope="col">Mac mit Apple-Chip</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Programm<span class="anm">für echte Abrechnungen, startet leer</span></th>
+          <td><code>…-windows-<wbr>x64.zip</code></td><td><code>…-macos-<wbr>arm64.zip</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Demo<span class="anm">zum Ausprobieren, mit erfundenen Gebäuden und Mietern</span></th>
+          <td><code>…-windows-<wbr>x64-demo.zip</code></td><td><code>…-macos-<wbr>arm64-demo.zip</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="aktionen">
+      <a class="knopf" href="https://github.com/MARVion123/Nebenkostenrechner-Releases/releases/latest">Zur neuesten Version</a>
+      <a class="knopf zweit" href="https://github.com/MARVion123/Nebenkostenrechner-Releases/releases">Alle Versionen</a>
+    </div>
+
+    <div class="zwei schritte">
+      <div>
+        <h3>Windows</h3>
+        <ol>
+          <li>Die ZIP-Datei an einen festen Ort entpacken, zum Beispiel in deinen Benutzerordner.</li>
+          <li><span class="datei">Nebenkostenrechner.exe</span> starten. Java muss nicht installiert sein.</li>
+          <li>Beim ersten Start warnt Windows vor einer unbekannten App, weil die Datei nicht signiert ist:
+            „Weitere Informationen“, dann „Trotzdem ausführen“.</li>
+        </ol>
+      </div>
+      <div>
+        <h3>Mac</h3>
+        <ol>
+          <li>Die ZIP-Datei entpacken und <span class="datei">Nebenkostenrechner.app</span> starten.</li>
+          <li>Beim ersten Start einmal freigeben: Systemeinstellungen, Datenschutz &amp; Sicherheit, „Dennoch öffnen“.</li>
+          <li>Das Programm bietet an, sich in „Programme“ zu legen. Bitte annehmen, nur von dort kann es sich selbst
+            aktualisieren.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="einleitung">
+      Neue Versionen meldet das Programm beim Start. Auf dem Mac installiert es sie auf Wunsch selbst und behält die
+      vorherige Version zum Zurückkehren. Unter Windows lädt es sie herunter; dann den Programmordner durch den neuen
+      ersetzen. Die Daten liegen nicht im Programmordner und bleiben dabei, wie sie sind. Die Anleitung steht im
+      Programm unter „Mehr“, „Anleitung“.
+    </p>
+  </div>
+</section>
+
+<section class="abschnitt grenzen" id="grenzen" aria-labelledby="grenzen-titel">
+  <div class="wrap zwei">
+    <div>
+      <h2 id="grenzen-titel">Was du wissen solltest</h2>
+      <ul>
+        <li>Das Programm rechnet mit den Zahlen, die du einträgst. Es ersetzt keine rechtliche oder steuerliche Prüfung
+          einer Abrechnung.</li>
+        <li>Für den Mac gibt es nur eine Fassung für Apple-Chips (M1 und neuer), nicht für ältere Macs mit Intel.</li>
+        <li>Die Programmdateien sind nicht signiert. Deshalb warnen Windows und macOS beim ersten Start.</li>
+      </ul>
+    </div>
+    <div id="lizenz">
+      <h2>Lizenz</h2>
+      <p class="einleitung">
+        Freeware von Nino Breuer. Jeder darf das Programm kostenlos nutzen, privat und gewerblich, auf beliebig vielen
+        eigenen Geräten. Es gibt es nur hier; wer es empfehlen möchte, gibt den Link auf diese Seite weiter. Nicht
+        erlaubt sind das Weitergeben von Kopien, Verändern, Übernehmen von Teilen, Verkaufen und das Veröffentlichen
+        unter anderem Namen. Der vollständige Text steht im Programm unter „Mehr“, „Lizenz und Unterstützung …“. Der
+        Quellcode ist nicht öffentlich.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="abschnitt hell kaffee" id="kaffee" aria-labelledby="kaffee-titel">
+  <div class="wrap">
+    <img src="bilder/symbol.png" width="88" height="88" alt="">
+    <div>
+      <h2 id="kaffee-titel">Einen Kaffee ausgeben</h2>
+      <p class="einleitung">
+        Der Nebenkostenrechner ist ein privates Projekt und kostet nichts. Wenn er dir einen Abend mit
+        Taschenrechner und Zählerzetteln erspart, freue ich mich über einen Kaffee. Freiwillig und ohne Anspruch auf
+        eine Gegenleistung.
+      </p>
+      <div class="aktionen">
+        <a class="knopf" href="https://buymeacoffee.com/marvion" rel="noopener">Kaffee ausgeben</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="fuss">
+  <div class="wrap">
+    <p>© 2026 Nino Breuer. Der Nebenkostenrechner ist Freeware; der Quellcode ist nicht öffentlich.</p>
+    <p>Diese Seite lädt keine Inhalte von fremden Servern und setzt keine Cookies. Die Schrift Bitter steht unter der
+      <a href="schrift/OFL-Bitter.txt">SIL Open Font License</a>.</p>
+  </div>
+</footer>
+</body>
+</html>
