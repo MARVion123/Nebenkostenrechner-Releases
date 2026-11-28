@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nebenkostenrechner – kostenlose Nebenkostenabrechnung für Vermieter (Windows und Mac)</title>
-<meta name="description" content="Ein kostenloses Programm für Vermieter, die ihre Nebenkostenabrechnung selbst machen: Verbrauch und Kosten tagesgenau auf die Mieter verteilt, jeder Rechenschritt sichtbar, alles ein zweites Mal unabhängig nachgerechnet. Für Windows und Mac, die Daten bleiben auf dem eigenen Rechner.">
+<title>Nebenkostenrechner – die kostenlose Nebenkostenabrechnung für Vermieter (Windows, Mac und Linux)</title>
+<meta name="description" content="Kostenlos für alle Vermieter in Deutschland: Nebenkosten tagesgenau abrechnen, auch bei Ein- und Auszug mitten im Jahr, mit Nebenräumen und fertigem PDF für jeden Mieter. Jeder Rechenschritt sichtbar, alles ein zweites Mal nachgerechnet. Ohne Abo, ohne Cloud. Für Windows, Mac und Linux.">
 <meta name="color-scheme" content="light">
 <link rel="icon" type="image/png" href="symbol.png">
 <link rel="canonical" href="https://marvion123.github.io/Nebenkostenrechner-Releases/">
 <meta property="og:title" content="Nebenkostenrechner">
-<meta property="og:description" content="Nebenkostenabrechnungen, die jeder nachrechnen kann. Kostenlos für Windows und Mac.">
+<meta property="og:description" content="Die Nebenkostenabrechnung, die aufgeht. Kostenlos für alle Vermieter, ohne Abo und ohne Cloud.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
 <style>
@@ -202,6 +202,7 @@
 
   /* Daten */
   .zwei { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  .drei { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; align-items: start; }
   ul.liste { margin: 1rem 0 0; padding-left: 1.2rem; }
   ul.liste li + li { margin-top: 0.45rem; }
 
@@ -210,12 +211,27 @@
   .tabelle th, .tabelle td { padding: 0.8rem 1rem; text-align: left; vertical-align: top; }
   .tabelle thead th { background: #f4f7fa; font-family: var(--serif); font-weight: 620; border-bottom: 1px solid var(--linie); }
   .tabelle tbody tr + tr > * { border-top: 1px solid #e1e8ef; }
-  .tabelle tbody th { font-weight: 600; width: 34%; }
+  .tabelle tbody th { font-weight: 600; width: 30%; }
   .tabelle code, .datei { font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; font-size: 0.88em; background: #eef2f6; padding: 0.08em 0.35em; border-radius: 4px; }
   .tabelle code { white-space: nowrap; }
   .tabelle code wbr { white-space: normal; }
   .tabelle .anm { display: block; font-weight: 400; color: var(--leise); font-size: 0.92rem; margin-top: 0.2rem; }
   .schritte { margin-top: 2.25rem; }
+  .vorteile { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 3rem; margin-top: 1.5rem; }
+  .vorteile div { padding: 1.4rem 0; border-top: 1px solid var(--linie); }
+  .vorteile h3 { font-size: 1.22rem; line-height: 1.3; max-width: 26ch; text-wrap: balance; }
+  .vorteile p { margin-top: 0.5rem; max-width: 38rem; }
+  .verlauf { list-style: none; margin: 1.75rem 0 0; padding: 0; border-left: 2px solid var(--linie); }
+  .verlauf li { position: relative; padding: 0 0 1.35rem 1.5rem; max-width: 46rem; }
+  .verlauf li::before { content: ""; position: absolute; left: -7px; top: 0.45em; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--bogen); border: 2px solid var(--blau); }
+  .verlauf li:first-child::before { background: var(--blau); }
+  .verlauf .version { font-family: var(--serif); font-weight: 620; font-size: 1.08rem; }
+  .verlauf time { font-family: inherit; font-weight: 400; color: var(--leise); font-size: 0.95rem; margin-left: 0.5rem; }
+  .verlauf .version + p { margin-top: 0.3rem; }
+  .ideen { margin-top: 2.5rem; border: 2px dashed #b7c6d6; border-radius: 12px; padding: clamp(1.25rem, 4vw, 2.25rem); }
+  .ideen h3 { font-size: 1.3rem; }
+  .ideen > p { margin-top: 0.5rem; color: var(--leise); max-width: 40rem; }
   .schritte ol { margin: 0.75rem 0 0; padding-left: 1.35rem; }
   .schritte li + li { margin-top: 0.5rem; }
   .schritte li::marker { font-family: var(--serif); font-weight: 650; color: var(--blau-tief); }
@@ -236,7 +252,7 @@
 
   /* ------------------------------------------------------------ schmal */
   @media (max-width: 860px) {
-    .einstieg .wrap, .zwei { grid-template-columns: minmax(0, 1fr); }
+    .einstieg .wrap, .zwei, .drei, .vorteile { grid-template-columns: minmax(0, 1fr); }
     .einstieg h1 { max-width: 18ch; }
     .positionen div { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
     .bilder, .belege { grid-template-columns: minmax(0, 1fr); }
@@ -272,6 +288,7 @@
     </a>
     <nav aria-label="Hauptnavigation">
       <a class="text" href="#funktionen">Funktionen</a>
+      <a class="text" href="#lebt">Neuigkeiten</a>
       <a class="text" href="#kaffee">Kaffee ausgeben</a>
       <a class="knopf" href="#herunterladen">Herunterladen</a>
     </nav>
@@ -283,17 +300,18 @@
 <section class="einstieg" aria-labelledby="titel">
   <div class="wrap">
     <div>
-      <h1 id="titel">Neben&shy;kosten&shy;abrechnungen, die jeder nachrechnen kann</h1>
+      <h1 id="titel">Die Neben&shy;kosten&shy;abrechnung, die einfach aufgeht</h1>
       <p class="vorspann">
-        Ein kostenloses Programm für Vermieter, die ihre Abrechnung selbst machen. Es verteilt Verbrauch und Kosten
-        tagesgenau auf die Mieter, zeigt jeden Rechenschritt und rechnet alles ein zweites Mal unabhängig nach.
-        <strong>Für Windows und Mac. Deine Daten bleiben auf deinem Rechner.</strong>
+        Kostenlos für alle Vermieter in Deutschland, von der Einliegerwohnung bis zu mehreren Häusern. Einzug im März,
+        Auszug im Oktober, ein Kellerabteil dazu gemietet: Das Programm rechnet jeden Tag und jeden Zähler einheitlich
+        ab, legt jeden Rechenschritt offen und rechnet alles ein zweites Mal nach.
+        <strong>Für Windows, Mac und Linux. Deine Daten bleiben auf deinem Rechner.</strong>
       </p>
       <div class="aktionen">
-        <a class="knopf" href="#herunterladen">Herunterladen</a>
-        <a class="knopf zweit" href="#funktionen">Was es abrechnet</a>
+        <a class="knopf" href="#herunterladen">Kostenlos herunterladen</a>
+        <a class="knopf zweit" href="#nutzen">Was du davon hast</a>
       </div>
-      <p class="klein">Freeware, privat und gewerblich nutzbar. Keine Anmeldung, kein Abo. Zum Ausprobieren gibt es eine Demo mit erfundenen Gebäuden und Mietern.</p>
+      <p class="klein">Komplett kostenlos, privat und gewerblich. Keine Anmeldung, kein Abo, keine Werbung, keine Cloud. Zum Ausprobieren gibt es eine Demo mit erfundenen Gebäuden und Mietern.</p>
     </div>
 
     <figure class="zaehler" aria-labelledby="zaehler-titel">
@@ -342,12 +360,52 @@
   </div>
 </section>
 
+<section class="abschnitt nutzen" id="nutzen" aria-labelledby="nutzen-titel">
+  <div class="wrap">
+    <h2 id="nutzen-titel">Was du davon hast</h2>
+    <div class="vorteile">
+      <div>
+        <h3>Kein Abend mehr mit Taschenrechner und Zählerzetteln</h3>
+        <p>Du trägst Zählerstände, Rechnungen und Vorauszahlungen ein, das Programm verteilt. Am Ende hat jeder Mieter
+          seine fertige Abrechnung als PDF, zum Ausdrucken oder Verschicken.</p>
+      </div>
+      <div>
+        <h3>Einzug, Auszug, Leerstand: alles einheitlich</h3>
+        <p>Egal ob jemand mitten im Jahr einzieht, auszieht oder eine Einheit eine Weile leer steht: Gerechnet wird auf
+          den Tag genau, nach denselben Regeln für alle. Wer auszieht, bekommt seine Abrechnung als vorläufige
+          Fassung, sobald für ihn alles feststeht, ohne aufs Jahresende zu warten.</p>
+      </div>
+      <div>
+        <h3>Auch Keller, Speicher und Laden</h3>
+        <p>Nebenräume wie ein Kellerabteil rechnet das Programm bei Bedarf mit ab, auch wenn sie zu einer Wohnung dazu
+          gemietet sind. Auch ein Laden oder Büro im Haus lässt sich abrechnen; die Abrechnung spricht
+          dann neutral vom Mietobjekt.</p>
+      </div>
+      <div>
+        <h3>Weniger Diskussionen mit Mietern</h3>
+        <p>Unter jeder Position steht, wie der Betrag zustande kommt. Wer nachrechnen will, kann es, und kommt auf
+          dieselbe Zahl. Tippfehler fallen auf, bevor die Abrechnung das Haus verlässt.</p>
+      </div>
+      <div>
+        <h3>Wirklich kostenlos</h3>
+        <p>Kein Abo, keine Testphase, keine Werbung, keine bezahlte Vollversion. Nutzen darfst du es, so lange du willst,
+          auf beliebig vielen eigenen Geräten. Wer mag, gibt freiwillig einen Kaffee aus.</p>
+      </div>
+      <div>
+        <h3>Keine Cloud, trotzdem gesichert</h3>
+        <p>Nichts liegt auf fremden Servern. Damit trotzdem nichts verloren geht, sichert das Programm auf Wunsch an einen
+          zweiten Ort, etwa eine externe Festplatte, und hebt die letzten 30 Stände auf.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="abschnitt hell" id="funktionen" aria-labelledby="funktionen-titel">
   <div class="wrap">
     <h2 id="funktionen-titel">Was das Programm abrechnet</h2>
     <p class="einleitung">
       Von einer Wohnung bis zu mehreren Häusern auf mehreren Grundstücken. Am Ende steht für jeden Mieter eine
-      Abrechnung als PDF, in der jede Position mit ihrem Rechenweg steht.
+      Abrechnung als PDF, in der jede Position mit ihrem Rechenweg steht. Im Einzelnen:
     </p>
     <dl class="positionen">
       <div>
@@ -489,6 +547,62 @@
   </div>
 </section>
 
+<section class="abschnitt" id="lebt" aria-labelledby="lebt-titel">
+  <div class="wrap">
+    <h2 id="lebt-titel">Ein Projekt, das lebt</h2>
+    <p class="einleitung">
+      Der Nebenkostenrechner wird laufend weiterentwickelt: neue Funktionen, Fehlerbehebungen und Anregungen aus der
+      Praxis von Vermietern. Neue Versionen meldet das Programm beim Start selbst und zeigt vorher, was sie bringen.
+    </p>
+    <ol class="verlauf">
+      <li>
+        <p class="version">Version 1.6 <time datetime="2026-11-28">28. November 2026</time></p>
+        <p>Jetzt auch für Linux. Rückfragen zeigen ihren ganzen Text, die Anleitung beschreibt Installation und Updates
+          für jedes System.</p>
+      </li>
+      <li>
+        <p class="version">Version 1.5.2 <time datetime="2026-11-27">27. November 2026</time></p>
+        <p>„Daten prüfen“ findet wahrscheinliche Tippfehler, bevor ein PDF entsteht. Die Anschrift steht in der
+          Abrechnung, Kostenpositionen lassen sich umstellen, der Assistent kennt Nebenräume. Dazu mehrere
+          Fehlerbehebungen.</p>
+      </li>
+      <li>
+        <p class="version">Version 1.5.1 <time datetime="2026-11-27">27. November 2026</time></p>
+        <p>„So wird verteilt“ zeigt jede Position ohne Zähler bis zum einzelnen Mieter. Nach einem Update zeigt das
+          Programm einmal, was neu ist.</p>
+      </li>
+      <li>
+        <p class="version">Version 1.5 <time datetime="2026-11-26">26. November 2026</time></p>
+        <p>Tatsächlich gezahlte Vorauszahlungen lassen sich eintragen. Nach einem Auszug gibt es gleich eine vorläufige
+          Abrechnung.</p>
+      </li>
+      <li>
+        <p class="version">Version 1.4.1 <time datetime="2026-11-25">25. November 2026</time></p>
+        <p>Die Vorschau nennt, welche Zählerstände an welchem Tag noch fehlen, und gibt Hinweise auf unstimmige
+          Gesamtzähler.</p>
+      </li>
+    </ol>
+    <p class="klein"><a href="https://github.com/MARVion123/Nebenkostenrechner-Releases/releases">Alle Versionen mit
+      ihren Neuerungen</a></p>
+
+    <div class="ideen">
+      <h3 id="ideen-titel">Und als Nächstes? Ideen für später</h3>
+      <p>
+        Das hier steht auf der Ideenliste. Es ist nur eine Ideensammlung: unvollständig, ohne Termin und ohne Garantie,
+        dass es so kommt.
+      </p>
+      <ul class="liste">
+        <li><strong>Drucken direkt aus dem Programm</strong>, ohne Umweg über das PDF.</li>
+        <li><strong>Ablesen am Handy:</strong> Zählerstände im eigenen WLAN direkt am Zähler eintragen.</li>
+        <li><strong>Frühwarnung bei hohem Verbrauch:</strong> Zwischenstände eintragen und früh sehen, ob eine
+          Nachzahlung droht.</li>
+        <li><strong>Vorjahr übernehmen mit Bestätigung:</strong> die neue Abrechnung aus der alten, jeder Betrag einmal
+          bestätigt, damit kein alter Wert unbemerkt stehen bleibt.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <section class="abschnitt hell" id="herunterladen" aria-labelledby="herunterladen-titel">
   <div class="wrap">
     <h2 id="herunterladen-titel">Herunterladen und installieren</h2>
@@ -498,16 +612,24 @@
     </p>
     <table class="tabelle">
       <thead>
-        <tr><th scope="col">Was du brauchst</th><th scope="col">Windows</th><th scope="col">Mac mit Apple-Chip</th></tr>
+        <tr>
+          <th scope="col">Dein Rechner</th>
+          <th scope="col">Programm<span class="anm">für echte Abrechnungen, startet leer</span></th>
+          <th scope="col">Demo<span class="anm">zum Ausprobieren, mit erfundenen Gebäuden und Mietern</span></th>
+        </tr>
       </thead>
       <tbody>
         <tr>
-          <th scope="row">Programm<span class="anm">für echte Abrechnungen, startet leer</span></th>
-          <td><code>…-windows-<wbr>x64.zip</code></td><td><code>…-macos-<wbr>arm64.zip</code></td>
+          <th scope="row">Windows</th>
+          <td><code>…-windows-<wbr>x64.zip</code></td><td><code>…-windows-<wbr>x64-demo.zip</code></td>
         </tr>
         <tr>
-          <th scope="row">Demo<span class="anm">zum Ausprobieren, mit erfundenen Gebäuden und Mietern</span></th>
-          <td><code>…-windows-<wbr>x64-demo.zip</code></td><td><code>…-macos-<wbr>arm64-demo.zip</code></td>
+          <th scope="row">Mac<span class="anm">mit Apple-Chip</span></th>
+          <td><code>…-macos-<wbr>arm64.zip</code></td><td><code>…-macos-<wbr>arm64-demo.zip</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Linux<span class="anm">64 Bit</span></th>
+          <td><code>…-linux-<wbr>x64.tar.gz</code></td><td><code>…-linux-<wbr>x64-demo.tar.gz</code></td>
         </tr>
       </tbody>
     </table>
@@ -516,7 +638,7 @@
       <a class="knopf zweit" href="https://github.com/MARVion123/Nebenkostenrechner-Releases/releases">Alle Versionen</a>
     </div>
 
-    <div class="zwei schritte">
+    <div class="drei schritte">
       <div>
         <h3>Windows</h3>
         <ol>
@@ -535,11 +657,20 @@
             aktualisieren.</li>
         </ol>
       </div>
+      <div>
+        <h3>Linux</h3>
+        <ol>
+          <li>Die tar.gz-Datei an einen festen Ort entpacken, zum Beispiel in deinen Benutzerordner.</li>
+          <li>Im entpackten Ordner <span class="datei">bin/Nebenkostenrechner</span> starten. Java und Root sind nicht nötig.</li>
+          <li>Die tägliche Prüfung läuft über einen Timer deines Benutzers; dafür braucht es systemd, wie bei den
+            meisten Linux-Systemen.</li>
+        </ol>
+      </div>
     </div>
     <p class="einleitung">
       Neue Versionen meldet das Programm beim Start. Auf dem Mac installiert es sie auf Wunsch selbst und behält die
-      vorherige Version zum Zurückkehren. Unter Windows lädt es sie herunter; dann den Programmordner durch den neuen
-      ersetzen. Die Daten liegen nicht im Programmordner und bleiben dabei, wie sie sind. Die Anleitung steht im
+      vorherige Version zum Zurückkehren. Unter Windows und Linux lädt es sie herunter; dann den Programmordner durch
+      den neuen ersetzen. Die Daten liegen nicht im Programmordner und bleiben dabei, wie sie sind. Die Anleitung steht im
       Programm unter „Mehr“, „Anleitung“.
     </p>
   </div>
@@ -554,6 +685,7 @@
           einer Abrechnung.</li>
         <li>Für den Mac gibt es nur eine Fassung für Apple-Chips (M1 und neuer), nicht für ältere Macs mit Intel.</li>
         <li>Die Programmdateien sind nicht signiert. Deshalb warnen Windows und macOS beim ersten Start.</li>
+        <li>Für Linux gibt es eine Fassung für 64-Bit-Rechner mit Intel- oder AMD-Prozessor (x64), nicht für ARM.</li>
       </ul>
     </div>
     <div id="lizenz">

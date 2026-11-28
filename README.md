@@ -22,13 +22,15 @@ Kostenlos nutzbar, privat und gewerblich (Freeware, siehe [LIZENZ.md](LIZENZ.md)
 
 Rechts unter **Releases** die neueste Version öffnen und die passende Datei laden:
 
-| | Windows | Mac (Apple-Chip) |
+| Dein Rechner | **Programm** (für echte Abrechnungen, startet leer) | **Demo** (zum Ansehen, mit erfundenen Daten) |
 |---|---|---|
-| **Programm** (für echte Abrechnungen, startet leer) | `…-windows-x64.zip` | `…-macos-arm64.zip` |
-| **Demo** (zum Ansehen, mit erfundenen Daten) | `…-windows-x64-demo.zip` | `…-macos-arm64-demo.zip` |
+| Windows | `…-windows-x64.zip` | `…-windows-x64-demo.zip` |
+| Mac (Apple-Chip) | `…-macos-arm64.zip` | `…-macos-arm64-demo.zip` |
+| Linux (64 Bit) | `…-linux-x64.tar.gz` | `…-linux-x64-demo.tar.gz` |
 
 - Programm und Demo können nebeneinander installiert sein; sie berühren sich nicht.
-- Für den Mac gibt es nur eine Fassung für Apple-Chips (M1 und neuer).
+- Für den Mac gibt es nur eine Fassung für Apple-Chips (M1 und neuer), für Linux nur eine für 64-Bit-Rechner mit
+  Intel- oder AMD-Prozessor (x64).
 
 ## Installieren
 
@@ -43,12 +45,18 @@ Rechts unter **Releases** die neueste Version öffnen und die passende Datei lad
 3. Das Programm bietet dann an, sich in „Programme“ zu legen. Bitte annehmen: Nur von dort kann es sich selbst
    aktualisieren.
 
+**Linux:**
+1. tar.gz an einen festen Ort entpacken und im entpackten Ordner `bin/Nebenkostenrechner` starten. Java und root
+   sind nicht nötig.
+2. Die tägliche Prüfung läuft über einen Timer deines Benutzers; dafür braucht es systemd, wie bei den meisten
+   Linux-Systemen.
+
 ## Updates
 
 Neue Versionen meldet das Programm beim Start, mit dem, was sie Neues bringen.
 
 - **Mac:** Das Programm installiert sie auf Wunsch selbst und behält die vorherige Version zum Zurückkehren.
-- **Windows:** Das Programm lädt sie herunter. Dann den Programmordner durch den neuen ersetzen.
+- **Windows und Linux:** Das Programm lädt sie herunter. Dann den Programmordner durch den neuen ersetzen.
 
 Die Daten liegen nicht im Programmordner und bleiben dabei, wie sie sind. Die Anleitung steht im Programm unter
 „Mehr“ → „Anleitung“.
